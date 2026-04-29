@@ -1,0 +1,180 @@
+{
+  "name": "Manual Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d12fab85-fda1-4ec5-8f2b-64c7499fa666",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: {name:\"John\", age: 12} },\n  { json: {name:\"Toto\", age: 13} },\n  { json: {name:\"Titi\", age: 18} },\n  { json: {name:\"Tata\", age: 20} },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c974befc-30b3-4630-a8cb-52906bab4a77",
+      "name": "DataMock"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "name, age, adult",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "3522341f-9f3e-4cda-adbd-682e33e44b37",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "597e41ec-f7e1-4d86-a5c4-659c488b4373",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "$json.adult = $json.age >= 18;\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b4abc724-0d4e-4a56-8088-d0eebd8dd55d",
+      "name": "Add adult"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  item.json.timestamp = Date.now();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -112
+      ],
+      "id": "c8940c26-33c2-4bfb-83e7-614a1086f930",
+      "name": "add timestamp"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.timestamp = Date.now();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        96
+      ],
+      "id": "28564711-8283-4ae3-8d1a-69ac0ef9bc18",
+      "name": "add timestamp2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "DataMock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DataMock": {
+      "main": [
+        [
+          {
+            "node": "Add adult",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "add timestamp",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "add timestamp2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add adult": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add timestamp": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add timestamp2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "23397942-85b2-477f-b420-5e3d5826c408",
+  "meta": {
+    "instanceId": "af536b8f0367b8c3fe2728891cd65f5a891a3fa060b7bdeedc5e4299ba849e25"
+  },
+  "id": "Tvi6kPVoulfnY30Y",
+  "tags": []
+}

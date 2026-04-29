@@ -1,0 +1,102 @@
+{
+  "name": "HTTP",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a0455f39-8316-44ad-97ad-84114f23f8dd",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ce2addf8-6dcb-4838-9c97-0e5c7273f944",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "20eedd40-61b8-4b18-b733-e46ba77dd367",
+              "name": "name",
+              "value": "=L'employée s'appelle {{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "3c2130fd-e758-46d1-bcfa-1f81f91d5aea",
+              "name": "username",
+              "value": "={{ $json.username }}",
+              "type": "string"
+            },
+            {
+              "id": "c798e8e4-7e6e-4b97-8756-8b3b6045eb83",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "40c9f937-7497-4f7d-97cf-7501ed57aa1c",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ce436649-57b7-4ee8-ac42-76a2d43d83a7",
+  "meta": {
+    "instanceId": "af536b8f0367b8c3fe2728891cd65f5a891a3fa060b7bdeedc5e4299ba849e25"
+  },
+  "id": "0NNeCy7DfwDpKzTM",
+  "tags": []
+}

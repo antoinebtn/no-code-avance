@@ -1,0 +1,435 @@
+{
+  "name": "Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "check-age",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        160
+      ],
+      "id": "508e18c4-0c81-46c9-a238-3771bc9de27b",
+      "name": "Webhook",
+      "webhookId": "db0b03c2-4d1e-4eb6-8500-e283e12528f9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body\nbody.isAdult = body.age >= 18 \n\nreturn body;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        64
+      ],
+      "id": "84b55169-5526-49c6-b463-20acf0d52ad4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "RxgCyzQIOQe9xQF9",
+          "mode": "list",
+          "cachedResultName": "Table2",
+          "cachedResultUrl": "/projects/hNE22waPWTC8itqb/datatables/RxgCyzQIOQe9xQF9"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "message": "={{ $json.message }}",
+            "age": "={{ $json.age }}",
+            "source": "={{ $json.source }}",
+            "isAdult": "={{ $json.isAdult }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "isAdult",
+              "displayName": "isAdult",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        64
+      ],
+      "id": "205291bf-fe65-4260-bd75-a4d8e2f9daa1",
+      "name": "Insert row",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "RxgCyzQIOQe9xQF9",
+          "mode": "list",
+          "cachedResultName": "Table2",
+          "cachedResultUrl": "/projects/hNE22waPWTC8itqb/datatables/RxgCyzQIOQe9xQF9"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        -32
+      ],
+      "id": "54293831-1fc7-4418-a46b-4037589df6e6",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "content": "## Curl to test\n```\ncurl -X POST \"http://localhost:5678/webhook-test/check_age\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Alice Martin\",\n    \"email\": \"alice@example.com\",\n    \"message\": \"Je veux un devis pour un site vitrine\",\n    \"age\": 15,\n    \"source\": \"landing page\"\n  }'\n```",
+        "height": 240,
+        "width": 688
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -512,
+        -336
+      ],
+      "typeVersion": 1,
+      "id": "2a63e26b-2df2-40ca-bbe7-89fad2a75853",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "248d9a11-3f71-4146-9979-2c916dfdc581",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "4d94b900-1351-49ba-a839-691e77843d3c",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1b91adc9-a8cb-4599-8d56-0a2fc65fc853",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a77501fb-fcb8-401e-a45a-7aa8d3f58014",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "35fa1d85-7f6a-4d25-80b9-3e2ddea51c7a",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "204ffa08-001b-4186-879a-d67848df86fb",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2c666ca8-c28a-4ace-8b0a-0faea1a54961",
+              "leftValue": "={{ $json.body.age }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5596db69-65c4-4eee-9de4-ffe329237aa1",
+              "leftValue": "={{ $json.body.age }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c7ab4fbb-ea67-4d9d-aaf0-2f1086e734cd",
+              "leftValue": "={{ $json.body.source }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "932206f7-6d8d-4de8-9196-f25c60d40df0",
+              "leftValue": "={{ $json.body.source }}",
+              "rightValue": "={{ $json.body.source }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -32,
+        144
+      ],
+      "id": "4e136f33-aa53-4ef1-9fe6-c38606c83faf",
+      "name": "If",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"OK\"\n}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        864,
+        -32
+      ],
+      "id": "32795025-733b-478d-864f-021104beda6b",
+      "name": "Success Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"Internal server Error\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        640,
+        160
+      ],
+      "id": "b384a186-4393-4888-bde9-e407cde81e5b",
+      "name": "Insert row error"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"An error occurs\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        192,
+        256
+      ],
+      "id": "7972cd0c-87c5-4d93-81d8-23d8c03dbbb8",
+      "name": "Bad request error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert row error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bad request error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Bad request error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cc9b015d-c2d3-44c6-8f37-f8ba1c90c8b1",
+  "meta": {
+    "instanceId": "af536b8f0367b8c3fe2728891cd65f5a891a3fa060b7bdeedc5e4299ba849e25"
+  },
+  "id": "AITIPR0y2ESgJFB5",
+  "tags": []
+}
