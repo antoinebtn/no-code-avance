@@ -1,0 +1,222 @@
+{
+  "name": "Chat with local LLMs using n8n and Ollama SQL",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "0b25a633-57f8-41f7-a282-6a60212c2f41",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        288,
+        384
+      ],
+      "webhookId": "3be544f2-0732-4180-b531-76cd3ee2c37c",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": "phi3:latest",
+        "options": {}
+      },
+      "id": "7bc1d6b2-006b-4286-9220-429b7d4b63b8",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [
+        752,
+        624
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "2iWgG7a0qRiYNjJo",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Use this quesion to generate sql request\n{{ $json.chatInput }}\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Tu es un expert en bases de données PostgreSQL. Ton unique tâche est de traduire les demandes en français de l'utilisateur en requêtes SQL valides, optimisées et sécurisées, en te basant STRICTEMENT sur le schéma de la base de données fourni ci-dessous.\n\n=== SCHÉMA DE LA BASE DE DONNÉES ===\nDatabase Schema Context: \nDatabase schema:  Table: categories Columns: - id integer primary key - name text unique not null  Table: products Columns: - id integer primary key - name text not null - sku text unique not null - category_id integer references categories(id) - unit_price numeric(10,2) not null - active boolean default true  Table: customers Columns: - id integer primary key - full_name text not null - email text unique not null - country text not null  Table: orders Columns: - id integer primary key - customer_id integer references customers(id) - created_at timestamp not null - status text not null Allowed status values:   pending, paid, completed, shipped, cancelled, refunded  Table: order_items Columns: - id integer primary key - order_id integer references orders(id) - product_id integer references products(id) - quantity integer not null - unit_price numeric(10,2) not null  Relationships: - products.category_id = categories.id - orders.customer_id = customers.id - order_items.order_id = orders.id - order_items.product_id = products.id\n=====================================\n\nRègles strictes à respecter :\n\nRenvoie UNIQUEMENT la requête SQL brute.\n\nN'invente JAMAIS de tables ou de colonnes qui ne figurent pas dans le schéma ci-dessus.\n\nFais attention aux jointures et aux alias. Si tu utilises une sous-requête ou un alias, assure-toi que toutes les colonnes appelées dans le SELECT principal y soient correctement rattachées.\n\nNe commence JAMAIS ta réponse par des explications, du texte ou des salutations.\n\nN'utilise PAS de blocs de code Markdown (pas de sql au début ou de  à la fin).\n\nUtilise la syntaxe PostgreSQL.\n\nExemple :\nDemande : \"donne moi la catégorie avec le plus de ventes\"\nRéponse : SELECT c.name AS category, SUM(oi.quantity) as total_orders FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id GROUP BY c.name ORDER BY total_orders DESC LIMIT 1;"
+            }
+          ]
+        }
+      },
+      "id": "417cde76-284f-4ee2-bd18-47a2f1fd9baf",
+      "name": "Chat LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        752,
+        384
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a895153-6062-4aa4-9f90-e493ec5fb83a",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        384
+      ],
+      "id": "52be9458-2d98-4d09-9a7f-42f6fbf4ea5c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// On boucle sur tous les éléments entrants (généralement un seul depuis Ollama)\nfor (const item of $input.all()) {\n  let sqlQuery = item.json.text;\n\n  // 1. Sécurité anti-markdown\n  sqlQuery = sqlQuery.replace(/```sql|```/gi, '').trim();\n\n  // 2. Remplacement des \"\\n\" textuels et des vrais retours à la ligne par des espaces\n  sqlQuery = sqlQuery.replace(/\\\\n/g, ' ').replace(/\\n/g, ' ');\n\n  // 3. Nettoyage des espaces multiples pour que la requête soit propre\n  sqlQuery = sqlQuery.replace(/\\s+/g, ' ').trim();\n\n  // On injecte le résultat final\n  item.json.query_sql = sqlQuery;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        384
+      ],
+      "id": "5f0fd5fc-6638-469b-9654-eab62cdaa581",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "06ef0090-b252-4ff9-8e33-37e74a238a91",
+              "name": "query_sql",
+              "value": "={{ $json.query_sql }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        384
+      ],
+      "id": "e4e2eebc-fb49-4814-bde0-a8a4c91b0d78",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.query_sql }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1552,
+        384
+      ],
+      "id": "3e26771f-cfad-447e-b317-ecb8fd94b285",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "DTV5Mtnt0HhRgfSd",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Chat LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Chat LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c10fadae-5b80-4927-a0d3-3be1c86ab2ea",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "af536b8f0367b8c3fe2728891cd65f5a891a3fa060b7bdeedc5e4299ba849e25"
+  },
+  "id": "I9FK3QZwvjxfMq5T",
+  "tags": []
+}
